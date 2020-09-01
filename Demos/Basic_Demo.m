@@ -62,12 +62,21 @@ r_peaks = jqrs(ecg,HRVparams);
 % plot the detected r_peaks on the top of the ecg signal
 figure(1)
 hold on;
-plot(r_peaks./Fs, ecg(r_peaks),'o');
+plot(r_peaks./Fs, ecg(r_peaks), 'o-') % line up the detected peaks
 legend('ecg signal', 'detected R peaks')
+hold off;
 
+% find periodicity by autocorrelation
+[autocor, lags] = xcorr(ecg(r_peaks), Fs, 'coeff');
 
+figure(2);
+plot(lags/Fs*360, autocor); % set unit to second (s)
+xlabel('Lag (s)')
+ylabel('Autocorrelation')
 
+[pksh, lcsh] = findpeaks(autocor);
+short = mean(diff(lcsh))/Fs*360;
 
-
-
-
+hold on;
+plot(lags(lcsh)/Fs*360,pksh,'or'); % add peaks for the period
+hold off;
